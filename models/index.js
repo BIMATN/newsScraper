@@ -2,6 +2,6 @@
 
 module.exports = {
   users: require("./users"),
-  comments: require("./comments")
+  comments: require("./comments"),
   articles: require("./articles")
 };

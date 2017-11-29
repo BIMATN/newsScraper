@@ -16,7 +16,7 @@ var articlesSchema = new Schema({
   },
   link: {
     type: String
-  }
+  },
   // `comments` is an array that stores ObjectIds
   // The ref property links these ObjectIds to the comments model
   // This allows us to populate the article with any associated comments

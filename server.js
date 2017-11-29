@@ -2,7 +2,8 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
-
+const cheerio = require("cheerio"),
+      request = require("request");
 var PORT = 3000;
 
 // Require all models
@@ -19,6 +20,11 @@ app.use(logger("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
 // Use express.static to serve the public folder as a static directory
 app.use(express.static("public"));
+
+// handlebars
+var exphbs = require("express-handlebars");
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
@@ -42,6 +48,55 @@ mongoose.connect("mongodb://localhost/newsScraper", {
 
 // Routes
 
+// GET route for homepage
+app.get("/", function(req, res){
+  res.render("index");
+});
+
+// Route for getting all books from the db
+app.get("/scraped", function(req, res) {
+  // Make a request call to grab the HTML body from the site
+  request.get("https://www.reuters.com/news/world", function(error, response, html) {
+    // Load the HTML into cheerio and save it to a const
+    // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
+    const $ = cheerio.load(html);
+    // An empty array to save the data that we'll scrape
+    const results = [];
+    // Select each element in the HTML body from which you want information.
+    $(".feature", "#moreSectionNews").each(function(i, elem) {
+      const link = $(elem).children("h2").children().attr("href"),
+            title = $(elem).children("h2").text().trim(),
+            summary = $(elem).children("p").text().trim();
+      // Save these results in an object that we'll push into the results array we defined earlier
+      results.push({
+        title: title,
+        link: link,
+        summary: summary
+      });
+      db.articles
+        .find({title: title})
+        .then(function(exists){
+          if(exists.length==0){
+            // Using our articles model, we create an article document
+            db.articles
+              .create({
+                title: title,
+                summary: summary,
+                link: link
+              })
+          }
+        })
+    });
+    db.articles
+      .find({})
+      .then(function(articles){
+        res.render("scraped", {articles});
+      })
+    // Log the results you've found with cheerio
+    console.log(results);
+  });
+});
+
 // POST route for saving a new comment to the db and associating it with an article
 app.post("/submitComment", function(req, res) {
   // Create a new comment in the database
@@ -51,26 +106,11 @@ app.post("/submitComment", function(req, res) {
       // If a Book was created successfully, find one library (there's only one) and push the new Book's _id to the Library's `books` array
       // { new: true } tells the query that we want it to return the updated Library -- it returns the original by default
       // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-      return db.articles.findAndUpdate({comment.articleId}, { $push: { comments: comment._id } }, { new: true });
+      return db.articles.findAndUpdate({/*comment.articleId*/}, { $push: { comments: comment._id } }, { new: true });
     })
     .then(function(articleComments) {
       // If the Library was updated successfully, send it back to the client
       res.json(articleComments);
-    })
-    .catch(function(err) {
-      // If an error occurs, send it back to the client
-      res.json(err);
-    });
-});
-
-// Route for getting all books from the db
-app.get("/books", function(req, res) {
-  // Using our Book model, "find" every book in our db
-  db.Book
-    .find({})
-    .then(function(dbBook) {
-      // If any Books are found, send them to the client
-      res.json(dbBook);
     })
     .catch(function(err) {
       // If an error occurs, send it back to the client

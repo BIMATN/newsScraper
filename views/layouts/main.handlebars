@@ -2,15 +2,23 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 		<title>NEWSISH</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		<link rel="stylesheet" href="/assets/css/style.css">				
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="/assets/javascript/news.js"></script>
 	</head>
-	<body class = "container-fluid bg-warning">
-		{{{ body }}}
+	<body>
+		<nav class="navbar navbar-light bg-light">
+		  <span class="navbar-text mx-auto"><h2>The Scrape For Truth</h2></span>
+		</nav>
+		<div class = "container-fluid bg-secondary" id="backsplash">
+			{{{ body }}}
+		</div>
+		<footer class="footer">
+	      <div class="container">
+	        <span class="text-muted d-flex justify-content-center"> Copyright &copy; 2017 Benjamin Rodriguez </span>
+	      </div>
+		</footer>
 	</body>
-	<nav class="navbar fixed-bottom bg-light">
-	  <p><h6 class = "text-center">Benjamin Rodriguez</h6></p>
-	</nav>
 </html>

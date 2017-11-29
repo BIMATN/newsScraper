@@ -1,0 +1,9 @@
+<ul>
+  {{#each articles}}
+      <li>
+      	<h3>{{this.title}}<h3>
+      	<h5>{{this.summary}}</h5>
+      	<a class = "bg-primary text-success" href={{this.link}}>Click Here if You'd Like to Know More...</a>
+      </li>
+  {{/each}}
+</ul>
